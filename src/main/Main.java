@@ -11,9 +11,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import lejos.hardware.Audio;
 import lejos.hardware.BrickFinder;
 import lejos.hardware.Keys;
 import lejos.hardware.ev3.EV3;
@@ -50,7 +53,7 @@ public class Main {
 		boolean stop = false;
 
 		setupRobot();
-
+		
 		System.out.println("Start");
 		Delay.msDelay(2500);
 
@@ -63,6 +66,8 @@ public class Main {
 		
 		Map<String, Double> map = null;
 		
+		collect();
+		
 		while(!stop) {
 			try {
 				while((map = (Map<String, Double>)reader.readObject()) != null) {
@@ -72,11 +77,16 @@ public class Main {
 						break;
 					}
 				
-					
+					System.out.println(map);
+
 					//Do something with the map
 					followMap(map);
 					//System.out.println(map);
 					Delay.msDelay(2500);
+					
+					hold();
+					
+					dispense();
 					
 					//Request the next map
 					writer.write("next" + '\n');
@@ -106,20 +116,39 @@ public class Main {
 
 	private static void followMap(Map<String, Double> map) {
 		List<String> functions = new ArrayList<String>(map.keySet());
-		List<Double> values = new ArrayList<Double>(map.values());
+		List<Double> values = new ArrayList<Double>();
+		
+		Collections.sort(functions, new Sort());
+		
+		for(int i = 0; i < functions.size(); i++) {
+			values.add(map.get(functions.get(i)));
+		}
 		
 		for(int i = 0; i < map.size(); i++) {
-			String function = functions.get(i);
+			String function = functions.get(i).substring(0, 6);
 			
+				
 			switch (function) {
 			case "rotate":
 				System.out.println("Rotating " + values.get(i) + " °");
+				rotate(values.get(i));
 				break;
 			
 			case "travel":
 				System.out.println("Traveling " + values.get(i) + " cm");
+				moveForward(values.get(i));
 				break;
 				
+			case "xxxxxx":
+				hold();
+				dispense();
+				break;
+				
+			case "finish":
+				System.out.println("Victory");
+				victory();
+				break;
+
 			default:
 				System.out.println("Unknown function");
 				break;
@@ -128,6 +157,21 @@ public class Main {
 		}
 		
 	}
+	
+	
+	private static void victory() {
+		ev3brick = (EV3) BrickFinder.getLocal();
+		Audio audio = ev3brick.getAudio();
+		hold();
+		audio.setVolume(10);
+		audio.playNote(Audio.XYLOPHONE, 420, 500);
+		audio.playNote(Audio.XYLOPHONE, 510, 500);
+		audio.playNote(Audio.XYLOPHONE, 420, 500);
+		audio.playNote(Audio.XYLOPHONE, 640, 500);
+		audio.playNote(Audio.XYLOPHONE, 220, 500);
+		
+	}
+	
 	
 	private static void collect() {
 		LeftCollectMotor.setSpeed(720);
@@ -157,16 +201,16 @@ public class Main {
 
 		ev3brick = (EV3) BrickFinder.getLocal();
 		buttons = ev3brick.getKeys();
-
+		
 		// Hvis rotationen er upræcis kan det kalibreres ved at ændre offset, dog vil
-		// det være bedst at ændre faktoren i selve rotate() funktionen
-		wheel1 = WheeledChassis.modelWheel(LeftDrivingMotor, 5.5).offset(-5.6);
-		wheel2 = WheeledChassis.modelWheel(RightDrivingMotor, 5.5).offset(5.6);
+		// det være bedst at ændre faktoren i selve rotate() funktionen 5.525 offset er perfekt på ren overflade. 
+		wheel1 = WheeledChassis.modelWheel(LeftDrivingMotor, 4.237).offset(-5.625);
+		wheel2 = WheeledChassis.modelWheel(RightDrivingMotor, 4.237).offset(5.625);
 
 		chassis = new WheeledChassis(new Wheel[] { wheel1, wheel2 }, WheeledChassis.TYPE_DIFFERENTIAL);
 
 		pilot = new MovePilot(chassis);
-		pilot.setLinearSpeed(10);
+		pilot.setLinearSpeed(7);
 		pilot.setLinearAcceleration(pilot.getLinearAcceleration() / 4);
 		pilot.setAngularSpeed(20);
 	}
@@ -198,4 +242,25 @@ public class Main {
 		writer.close();
 	}
 
+	
+	static class Sort implements Comparator<String> {
+		
+		@Override
+		public int compare(String rotate, String travel) {
+			String rotateSub = rotate.substring(6, rotate.length());
+			String travelSub = travel.substring(6, travel.length());;
+			int rotateNum = Integer.parseInt(rotateSub); 
+			int travelNum = Integer.parseInt(travelSub);
+			
+			if(rotateNum < travelNum) {
+				return -1;
+			}
+			if(rotateNum > travelNum) {
+				return 1;
+			}
+			
+			return 0;
+		}}
+	
+	
 }
