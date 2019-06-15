@@ -57,6 +57,7 @@ public class Main {
 		System.out.println("Start");
 		Delay.msDelay(2500);
 
+		
 		try {
 			openServer();
 		} catch (IOException e) {
@@ -138,8 +139,13 @@ public class Main {
 				System.out.println("Traveling " + values.get(i) + " cm");
 				moveForward(values.get(i));
 				break;
+								
+			case "backward":
+				System.out.println("backward " + values.get(i) + " cm");
+				moveBackward(values.get(i));
+				break;
 				
-			case "xxxxxx":
+			case "deliver":
 				hold();
 				dispense();
 				break;
@@ -168,8 +174,7 @@ public class Main {
 		audio.playNote(Audio.XYLOPHONE, 510, 500);
 		audio.playNote(Audio.XYLOPHONE, 420, 500);
 		audio.playNote(Audio.XYLOPHONE, 640, 500);
-		audio.playNote(Audio.XYLOPHONE, 220, 500);
-		
+		audio.playNote(Audio.XYLOPHONE, 220, 500);	
 	}
 	
 	
