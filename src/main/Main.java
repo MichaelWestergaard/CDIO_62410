@@ -6,6 +6,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -54,8 +56,10 @@ public class Main {
 
 		setupRobot();
 		
+	    victory();
+
 		System.out.println("Start");
-		Delay.msDelay(2500);
+		Delay.msDelay(250);
 
 		
 		try {
@@ -67,9 +71,11 @@ public class Main {
 		
 		Map<String, Double> map = null;
 		
-		collect();
+	//	collect();
 		
 		while(!stop) {
+			//map.clear();
+		    System.out.println("test5");
 			try {
 				while((map = (Map<String, Double>)reader.readObject()) != null) {
 					if(map.isEmpty()) {
@@ -77,17 +83,18 @@ public class Main {
 						reader.close();
 						break;
 					}
-				
+				    System.out.println("test");
 					System.out.println(map);
 
 					//Do something with the map
 					followMap(map);
+								
 					//System.out.println(map);
 					Delay.msDelay(2500);
 					
 					hold();
 					
-					dispense();
+				//	dispense();
 					
 					//Request the next map
 					writer.write("next" + '\n');
@@ -115,6 +122,14 @@ public class Main {
 		
 	}
 
+	private static void openServer() throws IOException {
+		serv = new ServerSocket(3005);
+		socket = serv.accept();
+		reader = new ObjectInputStream(socket.getInputStream());
+		writer = new PrintWriter(socket.getOutputStream());
+	}
+	
+	
 	private static void followMap(Map<String, Double> map) {
 		List<String> functions = new ArrayList<String>(map.keySet());
 		List<Double> values = new ArrayList<Double>();
@@ -209,8 +224,8 @@ public class Main {
 		
 		// Hvis rotationen er upræcis kan det kalibreres ved at ændre offset, dog vil
 		// det være bedst at ændre faktoren i selve rotate() funktionen 5.525 offset er perfekt på ren overflade. 
-		wheel1 = WheeledChassis.modelWheel(LeftDrivingMotor, 4.237).offset(-5.625);
-		wheel2 = WheeledChassis.modelWheel(RightDrivingMotor, 4.237).offset(5.625);
+		wheel1 = WheeledChassis.modelWheel(LeftDrivingMotor, 4.237).offset(-6.325);
+		wheel2 = WheeledChassis.modelWheel(RightDrivingMotor, 4.237).offset(6.325);
 
 		chassis = new WheeledChassis(new Wheel[] { wheel1, wheel2 }, WheeledChassis.TYPE_DIFFERENTIAL);
 
@@ -233,12 +248,7 @@ public class Main {
 		pilot.rotate(angle * 1.0);
 	}
 
-	private static void openServer() throws IOException {
-		serv = new ServerSocket(3005);
-		socket = serv.accept();
-		reader = new ObjectInputStream(socket.getInputStream());
-		writer = new PrintWriter(socket.getOutputStream());
-	}
+
 
 	private static void closeServer() throws IOException {
 		serv.close();
