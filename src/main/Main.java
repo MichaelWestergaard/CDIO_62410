@@ -74,8 +74,8 @@ public class Main {
 	//	collect();
 		
 		while(!stop) {
-			//map.clear();
-		    System.out.println("test5");
+			
+			map = null;
 			try {
 				while((map = (Map<String, Double>)reader.readObject()) != null) {
 					if(map.isEmpty()) {
@@ -83,22 +83,25 @@ public class Main {
 						reader.close();
 						break;
 					}
-				    System.out.println("test");
 					System.out.println(map);
-
+					Delay.msDelay(1000);
+					
 					//Do something with the map
 					followMap(map);
 								
 					//System.out.println(map);
-					Delay.msDelay(2500);
+					//Delay.msDelay(2500);
 					
-					hold();
+					//hold();
 					
 				//	dispense();
+					
+					map = null;
 					
 					//Request the next map
 					writer.write("next" + '\n');
 					writer.flush();
+					break;
 				}
 			} catch (ClassNotFoundException | IOException e) {
 				// TODO Auto-generated catch block
@@ -155,12 +158,12 @@ public class Main {
 				moveForward(values.get(i));
 				break;
 								
-			case "backward":
-				System.out.println("backward " + values.get(i) + " cm");
+			case "backwa":
+				System.out.println("Backward " + values.get(i) + " cm");
 				moveBackward(values.get(i));
 				break;
 				
-			case "deliver":
+			case "delive":
 				hold();
 				dispense();
 				break;
