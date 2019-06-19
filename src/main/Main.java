@@ -60,7 +60,6 @@ public class Main {
 
 		System.out.println("Start");
 		Delay.msDelay(250);
-
 		
 		try {
 			openServer();
@@ -71,7 +70,7 @@ public class Main {
 		
 		Map<String, Double> map = null;
 		
-	//	collect();
+		collect();
 		
 		while(!stop) {
 			
@@ -166,6 +165,8 @@ public class Main {
 			case "delive":
 				hold();
 				dispense();
+				Delay.msDelay(5000);
+				collect();
 				break;
 				
 			case "finish":
