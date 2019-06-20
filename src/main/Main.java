@@ -177,7 +177,7 @@ public class Main {
 			case "traveS":
 				System.out.println("ForwardS " + values.get(i) + " cm");
 				moveForward(values.get(i));
-				pilot.setLinearSpeed(15);
+				//pilot.setLinearSpeed(15);
 				break;
 				
 			default:
@@ -240,7 +240,7 @@ public class Main {
 		chassis = new WheeledChassis(new Wheel[] { wheel1, wheel2 }, WheeledChassis.TYPE_DIFFERENTIAL);
 
 		pilot = new MovePilot(chassis);
-		pilot.setLinearSpeed(15);
+		pilot.setLinearSpeed(7);
 		pilot.setLinearAcceleration(pilot.getLinearAcceleration() / 4);
 		pilot.setAngularSpeed(20);
 	}
