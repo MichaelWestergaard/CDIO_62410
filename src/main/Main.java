@@ -174,6 +174,12 @@ public class Main {
 				victory();
 				break;
 
+			case "traveS":
+				System.out.println("ForwardS " + values.get(i) + " cm");
+				moveForward(values.get(i));
+				pilot.setLinearSpeed(15);
+				break;
+				
 			default:
 				System.out.println("Unknown function");
 				break;
@@ -234,7 +240,7 @@ public class Main {
 		chassis = new WheeledChassis(new Wheel[] { wheel1, wheel2 }, WheeledChassis.TYPE_DIFFERENTIAL);
 
 		pilot = new MovePilot(chassis);
-		pilot.setLinearSpeed(7);
+		pilot.setLinearSpeed(15);
 		pilot.setLinearAcceleration(pilot.getLinearAcceleration() / 4);
 		pilot.setAngularSpeed(20);
 	}
@@ -259,6 +265,10 @@ public class Main {
 		socket.close();
 		reader.close();
 		writer.close();
+		LeftDrivingMotor.close();
+		RightDrivingMotor.close();
+		LeftCollectMotor.close();
+		RightCollectMotor.close();
 	}
 
 	
