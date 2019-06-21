@@ -51,7 +51,7 @@ public class Main {
 	static Socket socket;
 	static PrintWriter writer;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		boolean stop = false;
 
 		setupRobot();
@@ -77,23 +77,21 @@ public class Main {
 			map = null;
 			try {
 				while((map = (Map<String, Double>)reader.readObject()) != null) {
-					if(map.isEmpty()) {
-						stop = true;
-						reader.close();
-						break;
+					if(map.containsKey("finish")) {
+						closeServer();
+						victory();
+						System.exit(0);
+						System.out.println("Exception at main");
+						throw new Exception();
+//						stop = true;
+//						reader.close();
+//						break;
 					}
 					System.out.println(map);
 					Delay.msDelay(1000);
 					
 					//Do something with the map
 					followMap(map);
-								
-					//System.out.println(map);
-					//Delay.msDelay(2500);
-					
-					//hold();
-					
-				//	dispense();
 					
 					map = null;
 					
@@ -110,7 +108,6 @@ public class Main {
 		
 		}
 		
-
 		try {
 			closeServer();
 		} catch (IOException e) {
@@ -132,7 +129,7 @@ public class Main {
 	}
 	
 	
-	private static void followMap(Map<String, Double> map) {
+	private static void followMap(Map<String, Double> map) throws Exception{
 		List<String> functions = new ArrayList<String>(map.keySet());
 		List<Double> values = new ArrayList<Double>();
 		
@@ -172,7 +169,9 @@ public class Main {
 			case "finish":
 				System.out.println("Victory");
 				victory();
-				break;
+				System.out.println("Exception at follow");
+				throw new Exception();
+				//break;
 
 			case "traveS":
 				System.out.println("ForwardS " + values.get(i) + " cm");
